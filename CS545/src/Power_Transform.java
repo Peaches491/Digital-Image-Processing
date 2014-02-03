@@ -44,9 +44,6 @@ public class Power_Transform implements PlugInFilter{
 				
 				// set the Intensity to I' = c * pow(I, gamma)
 				ip.set(x, y, Math.min( (int) (c*Math.pow(ip.get(x, y), gamma)), 255));
-				
-				// This version creates weird artifacts caused by rollover from the 8 Bit int. 
-				// ip.set(x, y, (int) (c*Math.pow(ip.get(x, y), gamma)) );
 			}
 		}
 	}
