@@ -1,8 +1,6 @@
 import ij.IJ;
 import ij.ImagePlus;
-import ij.gui.HistogramWindow;
 import ij.plugin.filter.PlugInFilter;
-import ij.plugin.frame.PlugInFrame;
 import ij.process.ImageProcessor;
 
 /**
