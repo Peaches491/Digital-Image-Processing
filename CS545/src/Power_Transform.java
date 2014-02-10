@@ -24,10 +24,18 @@ import ij.process.ImageProcessor;
  *               gamma is the power of the transformation
  *
  */
+
+// spine.jpg - When gamma is set to 1.4, a strange collision of the 
+//				 5th and 6th vertebrae is exposed
+
+// runway.jpg - Gamma 0.97 helps to reduce the glaring brightness of the
+//    			 image, but does not increase contrast enough to combat
+//				 the overall "haziness"
+
 public class Power_Transform implements PlugInFilter{
 	
 	double c = 1;
-	double gamma = 1.2;
+	double gamma = 0.97;
 
 	@Override
 	public int setup(String arg, ImagePlus imp) {
