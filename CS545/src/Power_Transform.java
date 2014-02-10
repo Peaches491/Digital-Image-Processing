@@ -35,7 +35,7 @@ import ij.process.ImageProcessor;
 public class Power_Transform implements PlugInFilter{
 	
 	double c = 1;
-	double gamma = 0.97;
+	double gamma = 1.20;
 
 	@Override
 	public int setup(String arg, ImagePlus imp) {
