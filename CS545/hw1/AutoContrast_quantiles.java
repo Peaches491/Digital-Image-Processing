@@ -1,4 +1,4 @@
-package hw1;
+
 
 import ij.IJ;
 import ij.ImagePlus;

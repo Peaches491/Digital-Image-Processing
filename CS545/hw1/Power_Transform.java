@@ -1,4 +1,4 @@
-package hw1;
+
 
 import ij.ImagePlus;
 import ij.plugin.filter.PlugInFilter;
