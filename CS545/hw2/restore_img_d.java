@@ -39,12 +39,16 @@ public class restore_img_d implements PlugInFilter{
 	@Override
 	public void run(ImageProcessor ip) {
 		
+		// Intensity of the sharpening
 		float c = -14.0f;
 		
+		// Construct the Lagrangian Kernel
 		float[] h = new float[]{  0.0f,  c/4.0f,    0.0f, 
 								c/4.0f,  1.0f-c,  c/4.0f, 
 								  0.0f,  c/4.0f,    0.0f};
 		
+		// Convolve the image with the above Kernel
+		// Convolve method confirmed to use "extend" edge method
 		ip.convolve(h, 3, 3);
 	}
 }

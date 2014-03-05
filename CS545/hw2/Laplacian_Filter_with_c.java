@@ -39,18 +39,22 @@ public class Laplacian_Filter_with_c implements PlugInFilter{
 
 	@Override
 	public int setup(String arg, ImagePlus imp) {
-		this.imp = imp;
+		this.imp = imp; // Store the ImagePlus object for later use
 		return DOES_8G;
 	}
 
 	@Override
 	public void run(ImageProcessor ip) {
 		
-		float c = 1.0f;
+		float c = 1.0f; // The initial value of C
+		
+		// Construct a dialog box to prompt the user for values of C
 		GenericDialog d = new GenericDialog("Test");
 		d.addNumericField("C Value: ", 1.0, 4);
 		
+		// While the loop has not terminated
 		while(running){
+			// Prompt the user for a new C value
 			d.showDialog();
 			
 			float old_c = c;
@@ -62,23 +66,29 @@ public class Laplacian_Filter_with_c implements PlugInFilter{
 				IJ.showMessage("Format Exception", exp.getMessage());
 			}
 			
+			// If this new C is the same as the old C
 			if(new_c == old_c) {
+				// Stop the loop and end program
 				IJ.showMessage("Ending!");
 				running = false;
 				d.setVisible(false);
-				break;
+				return;
 			}
 			
-			c = new_c;
 			
+			// Otherwise, reset the image, and apply new Kernel
+			c = new_c;
 			ip.reset();
 			
 			float[] h = new float[]{  0.0f,  c/4.0f,    0.0f, 
 									c/4.0f,  1.0f-c,  c/4.0f, 
 									  0.0f,  c/4.0f,    0.0f};
 			
+			// Convolve the image with the above Kernel
+			// Convolve method confirmed to use "extend" edge method
 			ip.convolve(h, 3, 3);
 			
+			// Update the displayed image and display to the user
 			imp.updateAndDraw();
 		}
 	}
