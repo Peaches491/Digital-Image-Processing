@@ -3,6 +3,8 @@
 	<classpathentry kind="src" path="lib/ij147v"/>
 	<classpathentry kind="src" path="hw2"/>
 	<classpathentry kind="src" path="hw1"/>
+	<classpathentry kind="src" path="hw3"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="lib/imagingbook.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
