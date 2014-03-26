@@ -1,24 +1,24 @@
 import ij.ImagePlus;
 import ij.plugin.filter.PlugInFilter;
-import ij.process.Blitter;
 import ij.process.ByteProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 
 
-public class Gradient_Magnitude implements PlugInFilter {
-	
-	private final float[] dfilt = {0.453014f, 0.0f, -0.453014f};
+public class Zero_Crossings implements PlugInFilter {
+
 	private FloatProcessor floatIP;
-	
+
 	@Override
 	public int setup(String arg, ImagePlus imp) {
-		
 		return DOES_ALL;
 	}
 
 	@Override
 	public void run(ImageProcessor ip) {
+		int w = ip.getWidth();
+		int h = ip.getHeight();
+		
 		if (ip instanceof FloatProcessor) {
 			floatIP = (FloatProcessor) ip.duplicate();
 		}
@@ -26,13 +26,18 @@ public class Gradient_Magnitude implements PlugInFilter {
 			floatIP = (FloatProcessor) ip.convertToFloat();
 		}
 		
-		floatIP.convolve(dfilt, 1, dfilt.length);
-		floatIP.convolve(dfilt, dfilt.length, 1);
 		
+		for(int x = 0; x < w; x++){
+			for(int y = 0; y < h; y++){
+				floatIP.set(x, y, (floatIP.get(x, y)==0 ? 1 : 0));
+			}
+		}
 		
 		if (ip instanceof ByteProcessor) {
 			ip.setPixels(floatIP.convertToByte(true).getPixels());
+		} else {
+			ip.setPixels(floatIP.getPixels());
 		}
 	}
-	
+
 }
