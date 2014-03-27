@@ -2,8 +2,26 @@ Daniel Miller
 CS 545- Digital Image Processing
 Homework 2
 
+#####################################################
+
+Problem 1 - Histogram Spec Averages
 
 
+This PlugInFilter processes 8 Bit Greyscale Images. 
+
+This PlugInFilter is designed to match an image's 
+histogram to an average calculated from a series
+of sample images. This histogram is specified by 
+the array 'new_h', and must be calculated by hand.
+
+The filter iterates through the given image's 
+cumulative histogram, and matches each intensity 
+to the target histogram. THe algorithm used is
+specified in Burger & Burge's Algorithm 5.3. 
+
+This algorithm may only be applied to 8 Bit images
+with dimensions 512 x 512. (Or equivalent area) 
+The histogram sizes must match
 
 
 #####################################################
