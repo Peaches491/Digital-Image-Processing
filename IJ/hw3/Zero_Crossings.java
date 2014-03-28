@@ -32,21 +32,8 @@ public class Zero_Crossings implements PlugInFilter {
 
 	@Override
 	public void run(ImageProcessor ip) {
-		int w = ip.getWidth();
-		int h = ip.getHeight();
 		
-		ImageProcessor result = new ByteProcessor(w, h);
-		
-		for(int x = 0; x < w; x++){
-			for(int y = 0; y < h; y++){
-				if(ip.getPixelValue(x+1, y) * ip.getPixelValue(x-1, y) < 0.0 ||
-				   ip.getPixelValue(x, y+1) * ip.getPixelValue(x, y-1) < 0.0){
-					result.putPixel(x, y, 255);
-				} else {
-					result.putPixel(x, y, 0);
-				}
-			}
-		}
+		ByteProcessor result = Utils.zeroCrossings(ip);
 		
 		ImagePlus win = new ImagePlus("Corners", result);
 		win.show();

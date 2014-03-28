@@ -26,7 +26,7 @@ public class Gradient_Magnitude implements PlugInFilter {
 	public void run(ImageProcessor ip) {
 		FloatProcessor fp = Utils.ipToFloat(ip);
 		
-		Utils.gradientMagnitude(fp, 4.0);
+		Utils.gradientMagnitude(fp, 8.0);
 		
 		Utils.displayFloat(ip, fp);
 	}

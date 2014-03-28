@@ -32,7 +32,7 @@ public class Laplacian_ implements PlugInFilter {
 		
 		FloatProcessor fp = Utils.ipToFloat(ip);
 		
-		Utils.laplacian(fp, 4.0);
+		Utils.laplacian(fp, 8.0);
 		
 		Utils.displayFloat(ip, fp);
 	}
