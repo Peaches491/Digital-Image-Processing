@@ -48,9 +48,11 @@ public class Zero_Crossings implements PlugInFilter {
 			}
 		}
 		
-		ImagePlus win = new ImagePlus("Corners", result);
-		win.show();
+//		ImagePlus win = new ImagePlus("Corners", result);
+//		win.show();
 		
+		
+		Utils.displayFloat(ip, (FloatProcessor)result.convertToFloat());
 	}
 }
 

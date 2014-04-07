@@ -37,7 +37,7 @@ public class Utils {
 		cv.convolve(vert, lfilt, 1, lfilt.length);
 		cv.convolve(horiz, lfilt, lfilt.length, 1);
 
-		vert.copyBits(horiz, 0, 0, Blitter.ADD);
+		vert.copyBits(horiz, 0, 0, Blitter.AND);
 		
 		ip.setPixels(vert.getPixels());
 	}
