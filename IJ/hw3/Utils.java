@@ -61,4 +61,34 @@ public class Utils {
 		}
 	}
 
+	public static boolean isMax(ImageProcessor ip, int u, int v) {
+		float this_val = ip.getPixelValue(u, v);
+		
+		if ( this_val <= ip.getPixelValue(u+1, v  ) ) return false;
+		if ( this_val <= ip.getPixelValue(u+1, v+1) ) return false;
+		if ( this_val <= ip.getPixelValue(u  , v+1) ) return false;
+		if ( this_val <= ip.getPixelValue(u-1, v+1) ) return false;
+		if ( this_val <= ip.getPixelValue(u-1, v  ) ) return false;
+		if ( this_val <= ip.getPixelValue(u-1, v-1) ) return false;
+		if ( this_val <= ip.getPixelValue(u  , v-1) ) return false;
+		if ( this_val <= ip.getPixelValue(u+1, v-1) ) return false;
+		
+		return true;
+	}
+	
+	public static void drawCorner(ImageProcessor ip, int u, int v, int value){
+		int paintvalue = value; 
+		int size = 2;
+		ip.setValue(paintvalue);
+		ip.drawLine(u - size, v, u + size, v);
+		ip.drawLine(u, v - size, u, v + size);
+	}
+	
+	public static void drawCircle(ImageProcessor ip, int u, int v, int r, int value){
+		int paintvalue = value; 
+		int size = 2;
+		ip.setValue(paintvalue);
+		ip.drawOval(u-r, v-r, 2*r, 2*r);
+	}
+
 }
