@@ -60,46 +60,38 @@ public class Circular_Hough implements PlugInFilter {
 
 		
 		//////////////////////////////////////////////////////////////
-		ImageStack max_supp = ImageStack.create(img_w, img_h, p_size, 32);
+		ImageStack max_supp = ImageStack.create(img_w, img_h, 0, 32);
 		for(int p_idx = 1; p_idx <= p_size; p_idx++){
-			max_supp.addSlice("", stack.getProcessor(p_idx));
+			max_supp.addSlice("", stack.getProcessor(p_idx).duplicate());
 		}
+		max_supp.deleteLastSlice();
 		
 		
 		
 		for(int p_idx = 1; p_idx <= p_size; p_idx++){
-			FloatProcessor p_ip = (FloatProcessor) stack.getProcessor(p_idx);
+			FloatProcessor c_ip = (FloatProcessor) stack.getProcessor(p_idx);
+			FloatProcessor t_ip = (FloatProcessor) max_supp.getProcessor(p_idx);
 			int r = p_idx + p_min - 1;
 			float level = 0;
 			
-			for(int u = 0; u < img_w; u++){
-				for(int v = 0; v < img_h; v++){
-					float i = p_ip.getPixelValue(u, v);
-					if(i > level) level = i;  
-				}
-			}
-			
-			level = level * 0.9999f;
-			if(level < 75) level = 75.0f;
-			
-			System.out.println("Thresholding to: " + level);
+			level = 5.0f * r;
 			
 			for(int u = 0; u < img_w; u++){
 				for(int v = 0; v < img_h; v++){
-					float val = p_ip.getPixelValue(u, v);
-					if ((val > level) && Utils.isMax(p_ip, u, v)){
-						p_ip.putPixelValue(u, v, 1.0f);
-						System.out.println("Set pixel at intensity: " + val);
+					float val = c_ip.getPixelValue(u, v);
+					if ((val > level) && Utils.isMax(c_ip, u, v)){
+						t_ip.putPixelValue(u, v, 1.0f);
 						Utils.drawCorner(ip, u, v, 127);
 						Utils.drawCircle(ip, u, v, r, 127);
 					} else {
-						p_ip.putPixelValue(u, v, 0.0f);
+						t_ip.putPixelValue(u, v, 0.0f);
 					}
 				}
 			}
 		}
 		
 		new ImagePlus("Results: Accumulator Array", stack).show();
+		new ImagePlus("Results: Thresholds", max_supp).show();
 	}
 
 	

@@ -34,8 +34,8 @@ public class Laplacian_Edge_Detection implements PlugInFilter {
 	@Override
 	public void run(ImageProcessor ip) {
 		
-		double sigma = 1.0;
-		double threshold = 10.0;
+		double sigma = 2.0;
+		double threshold = 8.0;
 		
 		FloatProcessor fp = Utils.ipToFloat(ip);
 		
@@ -50,7 +50,9 @@ public class Laplacian_Edge_Detection implements PlugInFilter {
 		ByteProcessor result = new ByteProcessor(grad, true);
 		result.copyBits(zeros, 0, 0, Blitter.AND);
 		
-		Utils.showInWindow(result, "Final result - S: " + sigma + " T: " + threshold);
+		ip.copyBits(result, 0, 0, Blitter.COPY);
+		
+//		Utils.showInWindow(result, "Final result - S: " + sigma + " T: " + threshold);
 	}
 
 }
