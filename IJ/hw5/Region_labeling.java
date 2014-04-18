@@ -5,7 +5,6 @@ import ij.plugin.filter.PlugInFilter;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
-
 public class Region_labeling implements PlugInFilter {
 
 	private int visited_val = 255;
@@ -82,22 +81,5 @@ public class Region_labeling implements PlugInFilter {
 
 }
 
-class Node {
-	int x = 0;
-	int y = 0;
-	Node(int x, int y){
-		this.x = x;
-		this.y = y;
-	}
-	
-	public Node(Node n, int i, int j) {
-		this.x = n.x + i;
-		this.y = n.y + j;
-	}
-	
-	@Override 
-	public String toString(){
-		return "(" + x + ", " + y + ")";
-	}
-}
+
 
