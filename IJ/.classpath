@@ -4,6 +4,7 @@
 	<classpathentry kind="src" path="hw2"/>
 	<classpathentry kind="src" path="hw3"/>
 	<classpathentry kind="src" path="hw4"/>
+	<classpathentry kind="src" path="hw5"/>
 	<classpathentry kind="lib" path="C:/Program Files/Java/jdk1.7.0_51/lib/tools.jar"/>
 	<classpathentry kind="lib" path="lib/imagingbook.jar" sourcepath="lib/imagingbook.jar"/>
 	<classpathentry kind="lib" path="lib/Gray_Morphology.jar"/>
