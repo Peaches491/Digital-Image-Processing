@@ -16,4 +16,13 @@ public class Node {
 	public String toString(){
 		return "(" + x + ", " + y + ")";
 	}
+	
+	@Override
+	public boolean equals(Object obj){
+		if( !(obj instanceof Node) ) return false;
+		Node o = (Node) obj;
+		if( this.x != o.x) return false;
+		if( this.y != o.y) return false;
+		return true;
+	}
 }

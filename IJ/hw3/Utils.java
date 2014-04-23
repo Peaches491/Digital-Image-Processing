@@ -134,7 +134,7 @@ public class Utils {
 	
 	public static void drawCorner(ImageProcessor ip, int u, int v, int value){
 		int paintvalue = value; 
-		int size = 2;
+		int size = 5;
 		ip.setValue(paintvalue);
 		ip.drawLine(u - size, v, u + size, v);
 		ip.drawLine(u, v - size, u, v + size);
@@ -142,9 +142,38 @@ public class Utils {
 	
 	public static void drawCircle(ImageProcessor ip, int u, int v, int r, int value){
 		int paintvalue = value; 
-		int size = 2;
 		ip.setValue(paintvalue);
 		ip.drawOval(u-r, v-r, 2*r, 2*r);
 	}
+	
+	public static void drawVector(ImageProcessor ip, int x, int y, double angle, double length, int value){
+		int paintvalue = value; 
+		int size = 12;
+		ip.setValue(paintvalue);
+		int xd = x + (int)(Math.cos(angle)*length);
+		int yd = y + (int)(Math.sin(angle)*length);
+		ip.drawLine(x, y, xd, yd);
+		ip.drawLine(xd, yd, (int)(xd + Math.cos(angle + 2.35)*size), 
+							(int)(yd + Math.sin(angle + 2.35)*size));
+		ip.drawLine(xd, yd, (int)(xd + Math.cos(angle - 2.35)*size), 
+							(int)(yd + Math.sin(angle - 2.35)*size));
+	}
+	
+	public static void drawEllipsoid(ImageProcessor ip, int x, int y, double ra, double rb, double theta, int value){
+		ip.setValue(value);
 
+		double t1 = -1*Math.PI;
+		double x0 = x + Math.cos(theta)*ra*Math.cos(t1) - Math.sin(theta)*rb*Math.sin(t1);
+		double y0 = y + Math.sin(theta)*ra*Math.cos(t1) + Math.cos(theta)*rb*Math.sin(t1);
+		double xFirst = x0;
+		double yFirst = y0;
+		for(double t = -1*Math.PI; t < Math.PI; t += 0.05){
+			double x1 = x + Math.cos(theta)*ra*Math.cos(t) - Math.sin(theta)*rb*Math.sin(t);
+			double y1 = y + Math.sin(theta)*ra*Math.cos(t) + Math.cos(theta)*rb*Math.sin(t);
+			ip.drawLine((int)x0, (int)y0, (int)x1, (int)y1);
+			x0 = x1;
+			y0 = y1;
+		}
+		ip.drawLine((int)x0, (int)y0, (int)xFirst, (int)yFirst);
+	}
 }

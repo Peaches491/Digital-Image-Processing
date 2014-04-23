@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Stack;
 
 import ij.ImagePlus;
@@ -19,12 +20,13 @@ public class Region_labeling implements PlugInFilter {
 	}
 
 	@Override
-	public void run(ImageProcessor ip) {
+	public void run(ImageProcessor orig_ip) {
+		
+		ImageProcessor ip = orig_ip.duplicate();
+		
 		int w = ip.getWidth();
 		int h = ip.getHeight();
 		
-		int threshold = 255;
-				
 		ByteProcessor expanded = new ByteProcessor(ip.getWidth(), ip.getHeight());
 		for(int u = 0; u<w; u++){
 			for(int v = 0; v<h; v++){
@@ -35,41 +37,45 @@ public class Region_labeling implements PlugInFilter {
 				
 			}
 		}
-
+		
+		ArrayList<ArrayList<Node> > regions = new ArrayList<ArrayList<Node> >();
+		ArrayList<Centroid> centroids = new ArrayList<Centroid>();
+		
 		for(int v = 0; v<h; v++){
 			for(int u = 0; u<w; u++){
-//				int u = 375;
-//				int v = 375;
-		
 				if(ip.getPixelValue(u, v) == unlabeled_val){
-					floodFill(u, v, ip, expanded, label);
+					ArrayList<Node> r = floodFill(u, v, ip, expanded, label);
+					regions.add(r);
+					
+					Centroid c = Region_Utils.centroid(r);
+					centroids.add(c);
+					
+					System.out.println(label + ": " + Region_Utils.orientation(r));
+					Utils.drawCorner(orig_ip, (int)c.x, (int)c.y, 128);
+					
+					Eccentricity e = Region_Utils.eccentricity(r);
+					System.out.println(e);
+					Utils.drawVector(orig_ip, (int)c.x, (int)c.y, Region_Utils.orientation(r), e.getRA(), 128);
+					
+					Utils.drawEllipsoid(orig_ip, (int)c.x, (int)c.y, e.getRA(), e.getRB(), Region_Utils.orientation(r), 128);
+					
 					label++;
 				}
 			}
 		}
-		
 	}
 
-	private void floodFill(int u, int v, ImageProcessor ip, ByteProcessor expanded, int label) {
+	private ArrayList<Node> floodFill(int u, int v, ImageProcessor ip, ByteProcessor expanded, int label) {
 		Stack<Node> s = new Stack<Node>();
 		s.push(new Node(u, v));
+		ArrayList<Node> pixels = new ArrayList<Node>();
 		
-		
-		
-//		while(!s.isEmpty() && s.size() < 25) {
 		while(!s.isEmpty()) {
 
 			Node n = s.pop();
 			
-//			System.out.print("Popped " + n + ": ");
-//			
-//			for(Node node : s){
-//				System.out.print(node);
-//				System.out.print(" ");
-//			}
-//			System.out.println("");
-			
 			ip.putPixel(n.x, n.y, label);
+			pixels.add(n);
 			expanded.putPixel(n.x, n.y, visited_val);
 			if((expanded.getPixel(n.x+1,   n.y) == unvisited_val)) s.push(new Node(n,  1,  0));
 			if((expanded.getPixel(  n.x, n.y+1) == unvisited_val)) s.push(new Node(n,  0,  1));
@@ -77,6 +83,7 @@ public class Region_labeling implements PlugInFilter {
 			if((expanded.getPixel(  n.x, n.y-1) == unvisited_val)) s.push(new Node(n,  0, -1));
 		}
 		
+		return pixels;
 	}
 
 }
