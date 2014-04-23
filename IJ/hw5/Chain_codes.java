@@ -1,4 +1,8 @@
 
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 import ij.ImagePlus;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ByteProcessor;
@@ -8,6 +12,14 @@ import ij.process.ImageProcessor;
 
 public class Chain_codes implements PlugInFilter {
 
+
+	int fg = 255;
+	int bg = 0;
+	
+	HashSet<Contour> chains = new HashSet<Contour>();
+
+	
+	
 	@Override
 	public int setup(String arg, ImagePlus imp) {
 		return DOES_8G;
@@ -15,139 +27,118 @@ public class Chain_codes implements PlugInFilter {
 
 	@Override
 	public void run(ImageProcessor orig_ip) {
+		int w = orig_ip.getWidth();
+		int h = orig_ip.getHeight();
+		
 		ImageProcessor ip = orig_ip.duplicate();
-		
-		int w = ip.getWidth();
-		int h = ip.getHeight();
-
-		ByteProcessor frontier = new ByteProcessor(ip.getWidth(), ip.getHeight());
+		ByteProcessor labelMap = new ByteProcessor(ip.getWidth(), ip.getHeight());
+//		ByteProcessor frontier = new ByteProcessor(ip.getWidth(), ip.getHeight());
 		
 		
-		int fg = 255;
-		int bg = 0;
-		
-		Node first_cell = null;
+		int R = 0;
 		
 		for(int v = 0; v<h; v++){
+			int Lk = 0;
 			for(int u = 0; u<w; u++){
-				if(frontierPixel(ip, u, v, fg, bg)){
-					frontier.putPixel(u, v, 128);
-					if(first_cell == null) first_cell = new Node(u, v);
+				if(ip.getPixel(u, v) == fg) {
+					if(Lk != 0){
+						labelMap.putPixel(u, v, Lk);
+					} else {
+						Lk = labelMap.getPixel(u, v);
+						if (Lk == 0) {
+							R++;
+							Lk = R;
+							Point xs = new Point(u, v);
+							Contour c_outer = TraceContour(xs, 0, Lk, ip, labelMap);
+							chains.add(c_outer);
+							labelMap.putPixel(u, v, Lk);
+						}
+					}
+				} else {
+					if (Lk != 0) {
+						if (labelMap.getPixel(u, v) == 0) {
+							Point xs = new Point(u-1, v);
+							Contour c_inner = TraceContour(xs, 1, Lk, ip, labelMap);
+							chains.add(c_inner);
+						}
+						Lk = 0;
+					}
 				}
-//				prev_pixel_val = ip.getPixel(u, v); 
 			}
 		}
 		
-		
-		System.out.println("First Frontier Cell: " + first_cell);
-		
-		if(first_cell != null) {
-			Node previous_cell = null;
-			Node current_cell = first_cell;
-			int loop = 0;
-			do{
-				previous_cell = current_cell;
-				int code = getChainCode_Single(frontier, current_cell, previous_cell);
-//				System.out.println("Node: " + current_cell + " Code: " + code + " Prev: " + previous_cell);
-				current_cell = followChain(current_cell, code);
-				loop++;
-//			} while (current_cell != first_cell && loop < 50);
-			} while (loop < 50);
-			
-//			int code = getChainCode_Single(frontier, current_cell);
-//			System.out.println("Code: " + code);
-//			current_cell = followChain(current_cell, code);
-//			System.out.println(current_cell);
-//			
-//			code = getChainCode_Single(frontier, current_cell);
-//			System.out.println("Code: " + code);
-//			current_cell = followChain(current_cell, code);
-//			System.out.println(current_cell);
-//			
-//			code = getChainCode_Single(frontier, current_cell);
-//			System.out.println("Code: " + code);
-//			current_cell = followChain(current_cell, code);
-//			System.out.println(current_cell);
+		for(Contour c : chains){
+			System.out.println(c);
 		}
+		
+		System.out.println(chains.iterator().next().makeChain(false));
+		System.out.println(chains.iterator().next().makeChain(true));
 		
 //		ImagePlus win = new ImagePlus("Frontier", frontier);
 //		win.show();
 	}
 
-	
-
-	private int getChainCode_Single(ImageProcessor frontier, Node cell, Node prev) {
-		for(int i = 0; i < 8; i++){
-			double val = makeChain(frontier, cell, i);
-			if(val != 0) {
-				System.out.println(followChain(cell, i) + " : " + i + " : " + prev);
-				if(followChain(cell, i) != prev) {
-					return i;
-				} else {
-					System.out.println("    " + cell + " != " + prev);
-				}
-			} 
+	private Contour TraceContour(Point xs, int ds, int lc, ImageProcessor ip, ByteProcessor labelMap) {
+		Pair<Point, Integer> nextPoint = FindNextPoint(xs, ds, ip, labelMap);
+		Point xt = nextPoint.getFirst();
+		Integer d_next = nextPoint.getSecond();
+		
+		Contour c = new Contour(lc);
+		c.addPoint(xt, d_next);
+		Point xp = xs;
+		Point xc = xt;
+		boolean done = xs.equals(xt);
+		
+		while(!done){
+			labelMap.putPixel(xc.x, xc.y, lc);
+			int d_search = (d_next +6) % 8;
+			Pair<Point, Integer> next = FindNextPoint(xc, d_search, ip, labelMap);
+			Point xn = next.getFirst();
+			d_next = next.getSecond();
+			xp = xc;
+			xc = xn;
+			done = xp.equals(xs) && xc.equals(xt);
+			if(!done) c.addPoint(xn, d_next);
 		}
-		return -1;
+		
+		return c;
 	}
 
-	private double makeChain(ImageProcessor frontier, Node first_cell, int i) {
-		switch (i) {
-		case 0:
-			return frontier.getPixelValue(first_cell.x + 1, first_cell.y);
-		case 1:
-			return frontier.getPixelValue(first_cell.x + 1, first_cell.y + 1);
-		case 2:
-			return frontier.getPixelValue(first_cell.x,     first_cell.y + 1);
-		case 3:
-			return frontier.getPixelValue(first_cell.x - 1, first_cell.y + 1);
-		case 4:
-			return frontier.getPixelValue(first_cell.x - 1, first_cell.y);
-		case 5:
-			return frontier.getPixelValue(first_cell.x - 1, first_cell.y - 1);
-		case 6:
-			return frontier.getPixelValue(first_cell.x,     first_cell.y - 1);
-		case 7:
-			return frontier.getPixelValue(first_cell.x + 1, first_cell.y - 1);
-		default:
-			break;
+	private Pair<Point, Integer> FindNextPoint(Point xc, int d,
+			ImageProcessor ip, ByteProcessor labelMap) {
+		for(int i = 0; i <= 6; i++){
+			Point xprime = new Point(xc.x + DELTA(d).x, xc.y + DELTA(d).y);
+			if (ip.getPixel(xprime.x, xprime.y) == this.bg){
+				labelMap.putPixel(xprime.x, xprime.y, -1);
+				d = (d+1) % 8;
+			} else {
+				return new Pair<Point, Integer>(xprime, d);
+			}
 		}
-		return -1;
+		return new Pair<Point, Integer>(xc, d);
 	}
-	
-	private Node followChain(Node current_cell, int i) {
-		switch (i) {
+
+	private Point DELTA(int d) {
+		switch (d) {
 		case 0:
-			return new Node(current_cell,  1,  0);
+			return new Point( 1,  0);
 		case 1:
-			return new Node(current_cell,  1,  1);
+			return new Point( 1,  1);
 		case 2:
-			return new Node(current_cell,  0,  1);
+			return new Point( 0,  1);
 		case 3:
-			return new Node(current_cell, -1,  1);
+			return new Point(-1,  1);
 		case 4:
-			return new Node(current_cell, -1,  0);
+			return new Point(-1,  0);
 		case 5:
-			return new Node(current_cell, -1, -1);
+			return new Point(-1, -1);
 		case 6:
-			return new Node(current_cell,  0, -1);
+			return new Point( 0, -1);
 		case 7:
-			return new Node(current_cell,  1, -1);
+			return new Point( 1, -1);
 		default:
 			break;
 		}
 		return null;
 	}
-
-	private boolean frontierPixel(ImageProcessor ip, int u, int v, double fg, double bg) {
-		if( (ip.getPixel(  u,   v) != fg) ) return false;
-		if( (ip.getPixel(u+1,   v) == bg) ) return true;
-		if( (ip.getPixel(u-1,   v) == bg) ) return true;
-		if( (ip.getPixel(  u, v+1) == bg) ) return true;
-		if( (ip.getPixel(  u, v-1) == bg) ) return true;
-		
-		return false;
-	}
-	
-
 }
