@@ -99,16 +99,34 @@ public class Contour implements Comparable<Contour> {
 			if(i == size-1){
 				diffChain.add( ((chain.get(0)   - chain.get(i))+8) % 8 );
 			} else {
-				diffChain.add( (chain.get(i+1) - chain.get(i)) % 8 );
+				diffChain.add( (chain.get(i+1) - chain.get(i)+8) % 8 );
 			}
 		}
 		
 		return diffChain;
 	}
 
-	private int getShapeNumber() {
-		// TODO Auto-generated method stub
-		return 0;
+	public double getShapeNumber() {
+		double largest = 0.0;
+		int size = this.points.size();
+		for(int i = 0; i < size; i++){
+			double new_val = this.getShapeNumber_offset(i);
+			if(new_val > largest){
+				largest = new_val;
+			}
+		}
+		return largest;
+	}
+	
+	public double getShapeNumber_offset(int offset) {
+		double num = 0;
+		int size = this.points.size();
+		List<Integer> dchain = this.makeChain(true); 
+		for(int i = 0; i < size; i++){
+			num += dchain.get( (i+offset)%size );
+			num *= 8;
+		}
+		return num;
 	}
 	
 	//--------------------- retrieve contour points -------
@@ -164,7 +182,7 @@ public class Contour implements Comparable<Contour> {
     }
 	
 	public int hashCode() {
-		return this.getShapeNumber();
+		return Double.valueOf( this.getShapeNumber() ).hashCode();
 	}
 
 }

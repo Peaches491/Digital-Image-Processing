@@ -59,6 +59,7 @@ public class Chain_codes implements PlugInFilter {
 						if (labelMap.getPixel(u, v) == 0) {
 							Point xs = new Point(u-1, v);
 							Contour c_inner = TraceContour(xs, 1, Lk, ip, labelMap);
+//							System.out.print("Trying to add: " + c_inner + "   ");
 							chains.add(c_inner);
 						}
 						Lk = 0;
@@ -69,10 +70,15 @@ public class Chain_codes implements PlugInFilter {
 		
 		for(Contour c : chains){
 			System.out.println(c);
+			
+			for(Point p : c.getPointList()){
+				orig_ip.putPixel(p.x, p.y, 128);
+			}
 		}
 		
 		System.out.println(chains.iterator().next().makeChain(false));
 		System.out.println(chains.iterator().next().makeChain(true));
+		System.out.println(chains.iterator().next().getShapeNumber());
 		
 //		ImagePlus win = new ImagePlus("Frontier", frontier);
 //		win.show();
